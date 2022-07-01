@@ -19,11 +19,11 @@
     >
      <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
-        <v-btn >
-          Editar {{item.descripcion}}
+        <v-btn @click="EditCategoria(item)">
+          Editar 
         </v-btn>
-         <v-btn>
-          Eliminar {{item.descripcion}}
+         <v-btn @click="DeleteCategoria(item)">
+          Eliminar 
         </v-btn>
       </td>
     </template>
@@ -50,11 +50,11 @@
     >
      <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
-        <v-btn >
-          Editar {{item.descripcion}}
+        <v-btn @click="EditItem(item)">
+          Editar 
         </v-btn>
-         <v-btn>
-          Eliminar {{item.descripcion}}
+         <v-btn @click="deleteItem(item)">
+          Eliminar
         </v-btn>
       </td>
     </template>
@@ -124,6 +124,7 @@
         </v-card-actions>
      </v-card>
    </v-row>
+   <!--Categorias-->
    <v-dialog v-model="dialogcate">
        <v-card>
         <v-card-text>
@@ -146,7 +147,9 @@
             v-model="fechacreacion_cat"
             label="Fecha_Creacion"
             required
-          ></v-text-field>
+          >
+          </v-text-field>
+         
           </v-row>
           <v-row>
             <v-text-field
@@ -170,6 +173,8 @@
         </v-card-actions>
       </v-card>
    </v-dialog>
+   <!--Categorias-->
+   <!--Tipo de movimiento-->
     <v-dialog v-model="dialogtipomv">
        <v-card>
         <v-card-text>
@@ -223,6 +228,71 @@
         </v-card-actions>
       </v-card>
    </v-dialog>
+     <v-dialog v-model="dialogedittipo">
+       <v-card>
+        <v-card-text>
+          <v-row>
+            <v-text-field
+            v-model="editItem.codigo"
+            label="Codigo"
+            required
+          ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
+            v-model="editItem.descripcion"
+            label="Descripcion"
+            required
+          ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
+            v-model="editItem.factor"
+            label="Factor"
+            required
+          ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
+            v-model="editItem.fechacreacion"
+            label="Fecha_Creacion"
+            required
+          ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
+            v-model="editItem.fechamodificacion"
+            label="Fecha_modificacion"
+            required
+          ></v-text-field>
+          </v-row>
+        </v-card-text>
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="addTipoMovimiento"
+          >
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+   </v-dialog>
+   <v-dialog v-model="dialogDeletetipo" max-width="500px">
+          <v-card>
+            <v-card-title class="text-h5">Esta seguro de eliminar este elemento?</v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+    </v-dialog>
+     <!--Tipo de movimiento-->
+     <!--Bodega-->
    <v-dialog v-model="dialogbodega">
        <v-card>
         <v-card-text>
@@ -276,6 +346,8 @@
         </v-card-actions>
       </v-card>
    </v-dialog>
+   <!--Bodega-->
+   <!--Articulo-->
     <v-dialog v-model="dialogarticulo">
        <v-card>
         <v-card-text>
@@ -350,6 +422,7 @@
         </v-card-actions>
       </v-card>
    </v-dialog>
+    <!--Articulo-->
   </div>
   
 </template>
@@ -360,20 +433,42 @@ export default ({
   name: 'HomeView',
   data () {
       return {
+        //data categorias
+        dialogeditcate:false,
+        dialogDeletetcate:false,
+        editedcateIndex: -1,
+        editIcate:{
+          id:0,
+          descripcion: '',
+          factor: 0,
+          fechacreacion: '',
+          fechamodificacion: '',
+         },
         dialogcate: false, 
         descripcion_cat: this.$store.state.categoria.descripcion,
         foto_cat: this.$store.state.categoria.foto,
         fechacreacion_cat: this.$store.state.categoria.fechacreacion,
         fechamodificacion_cat: this.$store.state.categoria.fechamodificacion,
         headers_categorias:[
-        //  { text: 'id', value: 'id' },
           { text: 'Descripcion', value: 'descripcion' },
           { text: 'Foto', value: 'foto' },
           { text: 'Fecha Creacion', value: 'fechacreacion' },
           { text: 'Fecha Modificacion', value: 'fechamodificacion' },
         ],
         categorias:[],
+        //data tipomovimiento
         dialogtipomv:false,
+        dialogedittipo:false,
+        dialogDeletetipo:false,
+         editedIndex: -1,
+         editItem:{
+           id:0,
+          codigo:0,
+          descripcion: '',
+          factor: 0,
+          fechacreacion: '',
+          fechamodificacion: '',
+         },
         codigo:'',
         descripcion_move: '',
         factor: 1,
@@ -402,7 +497,8 @@ export default ({
          fechacreacion: '13-06-2011',
          fechamodificacion: '13-06-2012',
       },
-    ],
+    ],   
+        //Bodega
         dialogbodega:false,
         codigo_bodega:'',
         descripcion_bode: '',
@@ -433,6 +529,7 @@ export default ({
          fechamodificacion: '13-06-2012',
       },
     ],  
+        //Articulo
        dialogarticulo:false,
         codigo_articulo:'',
         descripcion_art: '',
@@ -480,16 +577,27 @@ export default ({
   methods:{
       addCategoria(){
          this.dialogcate=false;
-        //this.categorias.push({id:this.categorias.length, descripcion:this.descripcion_cat, foto:this.foto_cat,fechacreacion: this.fechacreacion_cat, fechamodificacion:this.fechamodificacion_cat});
         this.$store.state.categoria={id:this.categorias.length, descripcion:this.descripcion_cat, foto:this.foto_cat,fechacreacion: this.fechacreacion_cat, fechamodificacion:this.fechamodificacion_cat}
-        //console.log(this.categorias);
         this.$store.dispatch('addCategoriaAction');
         this.descripcion_cat='' 
         this.foto_cat='' 
         this.fechacreacion_cat='' 
         this.fechamodificacion_cat=''
       },
+      EditCategoria(item){
+       this.dialogeditcate=true;
+        console.log(item);
+        this.editedcateIndex=this.$store.state.categorias.indexOf(item);
+       // editIcate
+
+      },
+      DeleteCategoria(item){
+        this.dialogDeletetcate=true;
+        console.log(item);
+      },
+      //
       addTipoMovimiento(){
+        if(this.editedIndex<=-1){
          this.dialogtipomv=false;
          this.tipomovimiento.push(
           {id:this.tipomovimiento.length,
@@ -505,7 +613,28 @@ export default ({
         this.factor= 1;
         this.fechacreacion_move= '';
         this.fechamodificacion_move='';
+        }else{
+          Object.assign(this.tipomovimiento[this.editedIndex],this.editItem);
+          this.dialogedittipo=false;
+        }
       },
+      EditItem(item){
+        this.dialogedittipo=true;
+        this.editedIndex = this.tipomovimiento.indexOf(item)
+        this.editItem = Object.assign({}, item)
+        console.log(this.editItem);
+      },
+       deleteItem (item) {
+        this.editedIndex = this.tipomovimiento.indexOf(item)
+        this.editItem = Object.assign({}, item)
+        console.log(item);
+        this.dialogDeletetipo = true
+      },
+      deleteItemConfirm(){
+         this.tipomovimiento.splice(this.editedIndex,1);
+         this.dialogDeletetipo = false;
+      },
+      //
       Addbodega(){
        this.dialogbodega=false;
        this.Bodegas.push({
@@ -522,6 +651,7 @@ export default ({
         this.fechacreacion_bode= '',
         this.fechamodificacion_bode= '';
       },
+      //
       AddArticulo(){
         this.dialogarticulo=false;
         this.Articulos.push({

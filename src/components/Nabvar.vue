@@ -11,7 +11,6 @@
              <span>Navegacion</span>
          </v-toolbar-title>
          <v-spacer></v-spacer>
-         <router-link to="/">
          <v-btn flat="true" color="red" @click="salir">
            
             <span>Salir</span>
@@ -19,7 +18,6 @@
                mdi-exit
             </v-icon>
          </v-btn>
-         </router-link>
       </v-toolbar>
       <v-navigation-drawer v-model="drawer" app class="red" temporary="true">
           <v-list v-for="item in links" :key="item.text" >
@@ -56,6 +54,7 @@
     methods: {
       salir(){
          localStorage.removeItem('username');
+         this.$router.push('/');
       }
     },
 

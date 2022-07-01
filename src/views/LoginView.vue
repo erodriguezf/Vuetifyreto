@@ -26,9 +26,8 @@
      :disabled="!validateform"
      @click="ver"
     >
-    <router-link to="secion">
+    
       Inciar secion
-    </router-link>
     </v-btn>
     </v-card-actions>
     </v-container>
@@ -36,20 +35,21 @@
   </v-card>
 </template>
 <script>
+import axios from 'axios';
   export default {
     data(){
       return {
+      posts: [],
+      errors: [],
       valid: false,
       disabled: true,
       email: '',
       emailRules: [
         v => !!v || 'El Username es requerido',
-        v => /.+@.+/.test(v) || 'El Username debe ser en formato email',
       ],
       password: '',
       passworldRules:[
         v => !!v || 'La contraseña es requerida',
-        v => v.length >=8 || 'La contraseña debe ser de 8 caracteres minimo',
       ]
       }
     },
@@ -58,6 +58,17 @@
         this.$store.state.user=this.email;
          this.$store.dispatch('addEmailAction')
          localStorage.setItem('username', this.$store.state.user);
+         //https://localhost:7047/api/Login?usuario=Prueba4&password=12345
+          axios.get(`https://localhost:7047/api/Bodegas/Get`)
+    .then(response => {
+      // JSON responses are automatically parsed.
+      this.posts = response.data
+      console.log(this.posts);
+    })
+    .catch(e => {
+      this.errors.push(e)
+    })
+         this.$router.push('/secion');
          console.log('username : '+ this.$store.state.username);
       }
     },
