@@ -11,21 +11,8 @@
         :headers="headers_listado_inventario"
         :items="Listado_inventario"
         :items-per-page="5"
-        :single-expand="singleExpand"
-        :expanded.sync="expanded"
-     show-expand
          class="elevation-1"
     >
-     <template v-slot:expanded-item="{ headers, item }">
-      <td :colspan="headers.length">
-        <v-btn >
-          Editar {{item.id_bodega}}
-        </v-btn>
-         <v-btn>
-          Eliminar {{item.id_bodega}}
-        </v-btn>
-      </td>
-    </template>
     </v-data-table>
       <v-card-actions>
         <v-btn class="blue"
@@ -69,30 +56,35 @@
        <v-card>
         <v-card-text>
           <v-row>
-            <v-text-field
-            v-model="id_articulo"
+          <v-select
+           v-model="id_articulo"
             label="id Articulo"
-            required
-          ></v-text-field>
+            :items="list_articulos"
+          >
+            
+          </v-select>
           </v-row>
           <v-row>
-            <v-text-field
+           <v-select
             v-model="id_bodega"
             label="id Bodega"
-            required
-          ></v-text-field>
+            :items="list_Bodegas"
+           >
+          </v-select>
           </v-row>
           <v-row>
             <v-text-field
             v-model="saldo"
             label="Saldo"
             required
+             type="number"
           ></v-text-field>
           </v-row>
            <v-row>
             <v-text-field
             v-model="fechaultimomovimiento"
             label="Fecha Ultimo movimiento"
+             type="date"
             required
           ></v-text-field>
           </v-row>
@@ -118,14 +110,16 @@
             v-model="fechahora"
             label="Fecha Hora"
             required
+             type="date"
           ></v-text-field>
           </v-row>
            <v-row>
-            <v-text-field
+          <v-select
             v-model="id_tipomovimiento"
             label="id Tipo movimiento"
-            required
-          ></v-text-field>
+            :items="list_Tipo_movimiento"
+          >
+          </v-select>
           </v-row>
            <v-row>
             <v-text-field
@@ -135,24 +129,29 @@
           ></v-text-field>
           </v-row>
           <v-row>
-            <v-text-field
-            v-model="id_producto_m"
-            label="id Producto"
-            required
-          ></v-text-field>
+          <v-select
+           v-model="id_producto_m"
+          label="id Articulo"
+          :items="list_articulos"
+          >
+
+          </v-select>
           </v-row>
            <v-row>
-            <v-text-field
+           <v-select
             v-model="id_bodega_m"
             label="id Bodega"
-            required
-          ></v-text-field>
+            :items="list_Bodegas"
+           >
+            
+          </v-select>
           </v-row>
           <v-row>
             <v-text-field
             v-model="cantidad"
             label="Cantidad"
             required
+             type="number"
           ></v-text-field>
           </v-row>
         </v-card-text>
@@ -172,74 +171,93 @@
   </div>
 </template>
 <script>
+  import axios from 'axios'
    export default{
        data(){
          return{
+             config:{
+              headers: {
+              Authorization: `Bearer ${(localStorage.getItem('token'))}` ,
+               "Content-Type": "application/json"
+              }
+            },
+            list_articulos:[],
+            list_Bodegas:[],
+            list_Tipo_movimiento:[],
             dialoglistado:false,
             id_articulo:0,
             id_bodega:0,
             saldo:0,
             fechaultimomovimiento:'',
             headers_listado_inventario:[
-           {text: 'id Articulo', value:'id_articulo'},
-           {text: 'id Bodega', value:'id_bodega'},
+           {text: 'id Articulo', value:'idArticulo'},
+           {text: 'id Bodega', value:'idBodega'},
            {text: 'Saldo', value:'saldo'},
            {text: 'Fecha ultimo movimiento', value:'fechaultimomovimiento'},
       ],
-           Listado_inventario: [
-      { 
-        id_articulo:1,
-         id_bodega:3,
-        saldo: 120890,
-        fechaultimomovimiento: '13-06-2011',
-      },
-      { id_articulo:2,
-         id_bodega:4,
-         saldo: 120992,
-         fechaultimomovimiento: '13-06-2012',
-      },
-      ], dialoglmovimiento:false,
+           Listado_inventario: [], 
+          dialoglmovimiento:false,
          fechahora:'',
-         id_tipomovimiento:'',
+         id_tipomovimiento:0,
          observaciones:'',
          id_producto_m:0,
          id_bodega_m:0,
          cantidad:0,
          headers_movimiento:[
            {text: 'Fecha Hora', value:'fechahora'},
-           {text: 'id tipo movimiento', value:'id_tipomovimiento'},
+           {text: 'id tipo movimiento', value:'idTipomovimiento'},
            {text: 'Observaciones', value:'observaciones'},
-           {text: 'id producto', value:'id_producto'},
-           {text: 'id bodega', value:'id_bodega'},
+           {text: 'id articulo', value:'idArticulo'},
+           {text: 'id bodega', value:'idBodega'},
            {text: 'Cantidad', value: 'cantidad'}
          ],
         movimiento: [
-      { 
-        id:1,
-        fechahora: new Date(),
-        id_tipomovimiento: 4,
-        observaciones: 'primera observacion',
-        id_producto: 6,
-        id_bodega: 8,
-        cantidad:40
-      },
-      { id:2,
-        fechahora:new Date(),
-        id_tipomovimiento: 5,
-        observaciones: 'segunda observacion',
-         id_producto: 9,
-         id_bodega: 12,
-         cantidad:50
-      },
-    ],
+        ],
          }
        },
+         created () {
+         axios.get('/Inventario/Get',this.config)
+         .then(response => {
+            this.Listado_inventario = response.data;
+          })
+         .catch(e => {
+          console.log(e);
+         })
+         axios.get('/Movimiento/Get',this.config)
+         .then(response => {
+            this.movimiento = response.data;
+          })
+         .catch(e => {
+          console.log(e);
+         })
+          axios.get('/TipoMovimiento/Get',this.config)
+    .then(response => {
+       this.list_Tipo_movimiento = response.data.map(tipom=>tipom.id);
+    })
+    .catch(e => {
+      console.log(e);
+    }) 
+     axios.get('/Bodegas/Get',this.config)
+    .then(response => {
+       this.list_Bodegas = response.data.map(tipom=>tipom.id);
+    })
+    .catch(e => {
+      console.log(e);
+    }) 
+     axios.get('/Articulos/Get',this.config)
+    .then(response => {
+       this.list_articulos = response.data.map(tipom=>tipom.id);
+    })
+    .catch(e => {
+      console.log(e);
+    }) 
+         },
        methods:{
           AddListado(){
             this.dialoglistado=false,
              this.Listado_inventario.push({
-                id_articulo:this.id_articulo,
-                id_bodega:this.id_bodega,
+                idArticulo:this.id_articulo,
+                idBodega:this.id_bodega,
                 saldo:this.saldo,
                 fechaultimomovimiento:this.fechaultimomovimiento
              }),
@@ -253,10 +271,10 @@
             this.movimiento.push({
               id:this.movimiento.length,
               fechahora:this.fechahora,
-              id_tipomovimiento:this.id_tipomovimiento,
+              idTipomovimiento:this.id_tipomovimiento,
               observaciones:this.observaciones,
-              id_producto:this.id_producto,
-              id_bodega:this.id_bodega,
+              idArticulo:this.id_producto_m,
+              idBodega:this.id_bodega_m,
               cantidad:this.cantidad
             }),
             this.fechahora='',

@@ -1,27 +1,25 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import axios from 'axios'
 Vue.use(Vuex)
-
+//${JSON.stringify(localStorage.getItem('token')
+//${(localStorage.getItem('token'))}
 export default new Vuex.Store({
   state: {
     username: localStorage.getItem('username'),
+    config:{
+      headers: {
+        Authorization: `Bearer ${(localStorage.getItem('token'))}` ,
+        "Content-Type": "application/json"
+      }
+    },
+    posts: [],
+    errors: [],
     user:'',
     categorias: [
-      { 
-        id:1,
-        descripcion: 'Frozen Yogurt',
-        foto: 'https://i.ytimg.com/vi/yZ56s9OjcWA/maxresdefault.jpg',
-        fechacreacion: '13-06-2010',
-        fechamodificacion: '13-06-2011',
-      },
-      { id:2,
-        descripcion: 'Ice cream sandwich',
-        foto: 'https://i.ytimg.com/vi/yZ56s9OjcWA/maxresdefault.jpg',
-         fechacreacion: '13-06-2011',
-         fechamodificacion: '13-06-2012',
-      },
+     
     ],
+    categorias_token:[],
     categoria:{
       id:0,
       descripcion: '',
@@ -145,7 +143,21 @@ export default new Vuex.Store({
     ],
   },
   getters: {
+   getCategorias(state){
+    axios.get('/Categorias/Get',state.config)
+    .then(response => {
+       state.categorias_token = response.data;
+       console.log(state.categorias_token)
+       return response.data;
+    
+    })
+    .catch(e => {
+      console.log(e);
+      console.log('token: '+ (localStorage.getItem('token')));
+    })  
+    
   },
+},
   mutations: {
     addCategoria(state){
        state.categorias.push(state.categoria);

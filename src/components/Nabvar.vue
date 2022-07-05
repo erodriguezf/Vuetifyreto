@@ -54,6 +54,7 @@
     methods: {
       salir(){
          localStorage.removeItem('username');
+         localStorage.removeItem('token');
          this.$router.push('/');
       }
     },

@@ -30,8 +30,16 @@
       Inciar secion
     </v-btn>
     </v-card-actions>
+    <v-alert
+      dense
+      outlined
+      type="error"
+    v-if="error">
+     <strong>Usuario </strong> o <strong>Coñtraseña</strong> Incorrecta
+    </v-alert>
     </v-container>
   </v-form>
+  
   </v-card>
 </template>
 <script>
@@ -42,6 +50,7 @@ import axios from 'axios';
       posts: [],
       errors: [],
       valid: false,
+      error:false,
       disabled: true,
       email: '',
       emailRules: [
@@ -54,22 +63,30 @@ import axios from 'axios';
       }
     },
     methods:{
-      ver(){
-        this.$store.state.user=this.email;
-         this.$store.dispatch('addEmailAction')
-         localStorage.setItem('username', this.$store.state.user);
-         //https://localhost:7047/api/Login?usuario=Prueba4&password=12345
-          axios.get(`https://localhost:7047/api/Bodegas/Get`)
+  async  ver(){
+       let  resp=await axios.post(`/Login`,
+       {
+           username:this.email,
+           password:this.password
+         })
     .then(response => {
-      // JSON responses are automatically parsed.
+      
       this.posts = response.data
+      this.$store.state.user=this.posts.data.username;
+      this.$store.dispatch('addEmailAction')
+      localStorage.setItem('username', this.$store.state.user);
       console.log(this.posts);
+      console.log("Token: "+this.posts.token);
+      localStorage.setItem("token",this.posts.token);
+      this.$router.push('/secion');
     })
     .catch(e => {
-      this.errors.push(e)
-    })
-         this.$router.push('/secion');
+      this.errors.push(e);
+      this.error=true;
+    })  
+         
          console.log('username : '+ this.$store.state.username);
+         console.log(resp);
       }
     },
     computed:{

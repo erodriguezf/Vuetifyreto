@@ -85,16 +85,25 @@
           ></v-text-field>
           </v-row>
           <v-row>
-            <v-text-field
+            <!--v-text-field
             v-model="estado"
             label="Estado"
+             type="number"
             required
-          ></v-text-field>
+          ></v-text-field-->
+          <v-select
+             v-model="estado"
+            label="Estado"
+            :items="estados"
+          >
+             
+          </v-select>
           </v-row>
           <v-row>
             <v-text-field
             v-model="fechacreacion"
             label="Fecha_Creacion"
+             type="date"
             required
           ></v-text-field>
           </v-row>
@@ -102,6 +111,7 @@
             <v-text-field
             v-model="fechamodificacion"
             label="Fecha_modificacion"
+             type="date"
             required
           ></v-text-field>
           </v-row>
@@ -147,9 +157,17 @@
 </template>
 
 <script>
+import axios from 'axios'
   export default({
     data() {
       return {
+      estados:[1,2],
+       config:{
+      headers: {
+        Authorization: `Bearer ${(localStorage.getItem('token'))}` ,
+        "Content-Type": "application/json"
+        }
+       },
       dialogusuario:false,
       username:'',
       ultimologin:'',
@@ -164,38 +182,33 @@
           { text: 'Fecha Creacion', value: 'fechacreacion' },
           { text: 'Fecha Modificacion', value: 'fechamodificacion' },
       ],
-      usuarios: [
-      { 
-        username:1,
-        ultimologin: '12-03-2011',
-        estado: 'activo',
-        fechacreacion: '13-06-2010',
-        fechamodificacion: '13-06-2011',
-      },
-      { username:2,
-        ultimologin: '12-03-2012',
-        estado: 'activo',
-         fechacreacion: '13-06-2011',
-         fechamodificacion: '13-06-2012',
-      },
-    ],
+      usuarios: [],
      dialogroles:false,
      nombre:'',
      headers_roles:[
           { text: 'Nombre', value: 'nombre' }
       ],
      roles: [
-      { 
-        id:1,
-        nombre: 'nombre',
-        
-      },
-      { id:2,
-        nombre: 'nombre12',
-      },
     ],
       }
     },
+    created () {
+    axios.get('/Usuarios/Get',this.config)
+    .then(response => {
+       this.usuarios = response.data;
+    })
+    .catch(e => {
+      console.log(e);
+    })
+    axios.get('/Roles/Get',this.config)
+    .then(response => {
+       this.roles = response.data;
+    })
+    .catch(e => {
+      console.log(e);
+    })
+    },
+
     methods: {
       Addusuarios(){
         this.dialogusuario=false

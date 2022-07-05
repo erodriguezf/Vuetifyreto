@@ -1,5 +1,6 @@
 <template>
  <div class="home ">
+  <pre></pre>
    <h1>
      Configuracion
    </h1>
@@ -9,7 +10,7 @@
        <v-card-subtitle>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur iste ducimus error explicabo neque provident1.</v-card-subtitle>
      <v-data-table
     :headers="headers_categorias"
-    :items="this.$store.state.categorias"
+    :items="categorias"
     :items-per-page="5"
     :single-expand="singleExpand"
     :expanded.sync="expanded"
@@ -147,6 +148,7 @@
             v-model="fechacreacion_cat"
             label="Fecha_Creacion"
             required
+            type="date"
           >
           </v-text-field>
          
@@ -156,6 +158,7 @@
             v-model="fechamodificacion_cat"
             label="Fecha_modificacion"
             required
+            type="date"
           ></v-text-field>
           </v-row>
         </v-card-text>
@@ -193,17 +196,20 @@
           ></v-text-field>
           </v-row>
           <v-row>
-            <v-text-field
-            v-model="factor"
-            label="Factor"
-            required
-          ></v-text-field>
+          <v-select
+          v-model="factor"
+          label="Factor"
+          :items="lis_tipo"
+          >
+
+          </v-select>
           </v-row>
           <v-row>
             <v-text-field
             v-model="fechacreacion_move"
             label="Fecha_Creacion"
             required
+            type="date"
           ></v-text-field>
           </v-row>
           <v-row>
@@ -211,6 +217,7 @@
             v-model="fechamodificacion_move"
             label="Fecha_modificacion"
             required
+            type="date"
           ></v-text-field>
           </v-row>
         </v-card-text>
@@ -322,12 +329,14 @@
             v-model="fechacreacion_bode"
             label="Fecha_Creacion"
             required
+            type="date"
           ></v-text-field>
           </v-row>
           <v-row>
             <v-text-field
             v-model="fechamodificacion_bode"
             label="Fecha_modificacion"
+            type="date"
             required
           ></v-text-field>
           </v-row>
@@ -373,17 +382,22 @@
           ></v-text-field>
           </v-row>
           <v-row>
-            <v-text-field
-            v-model="id_categoria"
-            label="id categorias"
-            required
-          ></v-text-field>
+      
+          <v-select  
+          v-model="id_categoria"
+          label="id categorias"
+          :items="list_ids"
+          >
+  
+          </v-select>
           </v-row>
            <v-row>
             <v-text-field
             v-model="preciocompra"
             label="Precio Compra"
+            type="number"
             required
+            
           ></v-text-field>
           </v-row>
            <v-row>
@@ -391,6 +405,7 @@
             v-model="precioventa"
             label="Precio Venta"
             required
+             type="number"
           ></v-text-field>
           </v-row>
           <v-row>
@@ -398,6 +413,7 @@
             v-model="fechacreacion_arti"
             label="Fecha_Creacion"
             required
+            type="date"
           ></v-text-field>
           </v-row>
           <v-row>
@@ -405,6 +421,7 @@
             v-model="fechamodificacion_arti"
             label="Fecha_modificacion"
             required
+            type="date"
           ></v-text-field>
           </v-row>
         </v-card-text>
@@ -429,11 +446,20 @@
 
 <script>
 // Components
+import axios from 'axios'
 export default ({
   name: 'HomeView',
   data () {
       return {
+        config:{
+      headers: {
+        Authorization: `Bearer ${(localStorage.getItem('token'))}` ,
+        "Content-Type": "application/json"
+        }
+       },
         //data categorias
+        list_ids:[],
+        lis_tipo:[-1,1],
         dialogeditcate:false,
         dialogDeletetcate:false,
         editedcateIndex: -1,
@@ -481,23 +507,8 @@ export default ({
           { text: 'Fecha Creacion', value: 'fechacreacion' },
           { text: 'Fecha Modificacion', value: 'fechamodificacion' },
         ],
-         tipomovimiento: [
-      { 
-        id:1,
-        codigo:101,
-        descripcion: 'Frozen Yogurt',
-        factor: 1,
-        fechacreacion: '13-06-2010',
-        fechamodificacion: '13-06-2011',
-      },
-      { id:2,
-        codigo:202,
-        descripcion: 'Ice cream sandwich',
-        factor: -1,
-         fechacreacion: '13-06-2011',
-         fechamodificacion: '13-06-2012',
-      },
-    ],   
+         tipomovimiento: [],   
+
         //Bodega
         dialogbodega:false,
         codigo_bodega:'',
@@ -512,23 +523,7 @@ export default ({
           { text: 'Fecha Creacion', value: 'fechacreacion' },
           { text: 'Fecha Modificacion', value: 'fechamodificacion' },
         ],
-        Bodegas: [
-      { 
-        id:1,
-        codigo:101,
-        descripcion: 'Frozen Yogurt',
-        foto: 'https://i.ytimg.com/vi/yZ56s9OjcWA/maxresdefault.jpg',
-        fechacreacion: '13-06-2010',
-        fechamodificacion: '13-06-2011',
-      },
-      { id:2,
-        codigo:202,
-        descripcion: 'Ice cream sandwich',
-        foto: 'https://i.ytimg.com/vi/yZ56s9OjcWA/maxresdefault.jpg',
-         fechacreacion: '13-06-2011',
-         fechamodificacion: '13-06-2012',
-      },
-    ],  
+        Bodegas: [],  
         //Articulo
        dialogarticulo:false,
         codigo_articulo:'',
@@ -543,36 +538,46 @@ export default ({
           {text:'codigo', value: 'codigo'},
           { text: 'Descripcion', value: 'descripcion' },
           { text: 'Foto', value: 'foto' },
-          { text: 'id categoria', value: 'id_categoria'},
+          { text: 'id categoria', value: 'idCategoria'},
           { text: 'Precio compra', value: 'preciocompra'},
           { text: 'Precio venta', value: 'precioventa'},
           { text: 'Fecha Creacion', value: 'fechacreacion' },
           { text: 'Fecha Modificacion', value: 'fechamodificacion' },
        ],
-       Articulos: [
-      { 
-        id:1,
-        codigo:101,
-        descripcion: 'Frozen Yogurt',
-        foto: 'https://i.ytimg.com/vi/yZ56s9OjcWA/maxresdefault.jpg',
-        id_categoria:3,
-        preciocompra:1230,
-        precioventa:1456,
-        fechacreacion: '13-06-2010',
-        fechamodificacion: '13-06-2011',
-      },
-      { id:2,
-        codigo:202,
-        descripcion: 'Ice cream sandwich',
-        foto: 'https://i.ytimg.com/vi/yZ56s9OjcWA/maxresdefault.jpg',
-        id_categoria:4,
-        preciocompra:1456,
-        precioventa:2456,
-        fechacreacion: '13-06-2011',
-        fechamodificacion: '13-06-2012',
-      },
-    ]
+       Articulos: [ ],
       }
+  },
+ created () {
+     axios.get('/Categorias/Get',this.config)
+    .then(response => {
+       this.categorias = response.data;
+       this.list_ids=this.categorias.map(cate=>cate.id);
+       console.log(this.list_ids);
+    })
+    .catch(e => {
+      console.log(e);
+    })
+     axios.get('/TipoMovimiento/Get',this.config)
+    .then(response => {
+       this.tipomovimiento = response.data;
+    })
+    .catch(e => {
+      console.log(e);
+    }) 
+     axios.get('/Bodegas/Get',this.config)
+    .then(response => {
+       this.Bodegas = response.data;
+    })
+    .catch(e => {
+      console.log(e);
+    }) 
+     axios.get('/Articulos/Get',this.config)
+    .then(response => {
+       this.Articulos = response.data;
+    })
+    .catch(e => {
+      console.log(e);
+    }) 
   },
   methods:{
       addCategoria(){
@@ -659,7 +664,7 @@ export default ({
           codigo:this.codigo_articulo,
           descripcion:this.descripcion_art,
           foto:this.fotoart,
-          id_categoria:this.id_categoria,
+          idCategoria:this.id_categoria,
           preciocompra:this.preciocompra,
           precioventa:this.precioventa,
           fechacreacion:this.fechacreacion_arti,
