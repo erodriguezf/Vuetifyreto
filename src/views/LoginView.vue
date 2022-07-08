@@ -26,7 +26,6 @@
      :disabled="!validateform"
      @click="ver"
     >
-    
       Inciar secion
     </v-btn>
     </v-card-actions>
@@ -73,11 +72,12 @@ import axios from 'axios';
       
       this.posts = response.data
       this.$store.state.user=this.posts.data.username;
+      this.$store.state.token1=this.posts.token;
       this.$store.dispatch('addEmailAction')
       localStorage.setItem('username', this.$store.state.user);
       console.log(this.posts);
       console.log("Token: "+this.posts.token);
-      localStorage.setItem("token",this.posts.token);
+      localStorage.setItem("token",this.$store.state.token1);
       this.$router.push('/secion');
     })
     .catch(e => {

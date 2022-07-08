@@ -7,11 +7,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '',
-    name: 'about',
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },{
-    path: '/loging',
-    name: 'loging',
+   name: 'loging',
     component: ()=>import('../views/LoginView.vue')
   },
   {
@@ -22,7 +18,7 @@ const routes = [
       {
         path: 'Configuracion',
         name: 'Configuracion',
-        component: ()=>import('../views/ConfiguracionView.vue')
+        component: ()=>import('../views/ConfiguracionView.vue'),
       },
       {
         path: 'Inventario',
