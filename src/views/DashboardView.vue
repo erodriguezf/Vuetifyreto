@@ -25,7 +25,7 @@
    import MovimientosGraficsView from './Grafics/MovimientosGraficsView.vue'
    import ArticulosMovidosView from './Grafics/ArticulosMovidosView.vue'
    import ArticulosPorCategoriasView from './Grafics/ArticulosporCategoriasView.vue'
-
+   
   export default({
      data(){
          return{

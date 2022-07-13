@@ -63,6 +63,22 @@
         </v-form>
       </v-card>
    </v-dialog>
+   <v-dialog v-model="message1">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro creado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="crear">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+    </v-dialog>
    </v-row>
 </template>
 
@@ -94,6 +110,7 @@
             list_Tipo_movimiento:[],
             dialoglistado:false,
             valid:false,
+             message1:false,
             id_articulo:0,
             id_bodega:0,
             saldo:0,
@@ -143,7 +160,7 @@
              axios.post('/Inventario/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
-          location.reload();
+           this.message1=true
           })
          .catch(e => {
             console.log(e);
@@ -153,6 +170,10 @@
             this.saldo=0,
             this.fechaultimomovimiento=''
           },
+           crear(){
+         this.message1=false;
+           setTimeout(()=>{location.reload()},500)
+         }
    },
     computed:{
       validateform(){

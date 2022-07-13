@@ -156,6 +156,38 @@
             </v-card-actions>
           </v-card>
     </v-dialog>
+      <v-dialog v-model="message2">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro actualizado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="actualizar">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+        </v-dialog>
+          <v-dialog v-model="message1">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro creado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="crear">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+        </v-dialog>
    </v-row>
 </template>
 
@@ -186,6 +218,8 @@ import axios from 'axios'
           dialogtipomv:false,
         dialogedittipo:false,
         dialogDeletetipo:false,
+         message1:false,
+        message2:false,
         valid:false,
         lis_tipo:[-1,1],
          editedIndex: -1,
@@ -243,7 +277,7 @@ import axios from 'axios'
            axios.post('/TipoMovimiento/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
-          location.reload();
+            this.message1=true;
           })
          .catch(e => {
             console.log(e);
@@ -258,7 +292,7 @@ import axios from 'axios'
           axios.post('/TipoMovimiento/Actualizar',this.editItem,this.config)
            .then(response =>{
              console.log(response)
-             location.reload();
+             this.message2=true;
            })
            .catch(e => {
            console.log(e);
@@ -282,6 +316,14 @@ import axios from 'axios'
          this.tipomovimiento.splice(this.editedIndex,1);
          this.dialogDeletetipo = false;
       },
+       actualizar(){
+         this.message2=false;
+         setTimeout(()=>{location.reload()},500)
+      },
+      crear(){
+         this.message1=false;
+         setTimeout(()=>{location.reload()},500)
+      }
      },
      computed:{
       validateform(){

@@ -136,6 +136,38 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <v-dialog v-model="message2">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro actualizado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="actualizar">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+        </v-dialog>
+          <v-dialog v-model="message1">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro creado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="crear">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+        </v-dialog>
    </v-row>
 </template>
 <script>
@@ -162,6 +194,8 @@
         dialogeditcate:false,
         dialogDeletetcate:false,
         valid: false,
+        message1:false,
+        message2:false,
         editedcateIndex: -1,
          estados:[
           {text:'Activo',value:1},
@@ -207,7 +241,7 @@
         axios.post('/Categorias/Crear',nueva,this.config)
          .then(response =>{
           console.log(response);
-           location.reload();
+           this.message1=true;
           })
          .catch(e => {
             console.log(e);
@@ -222,7 +256,8 @@
             axios.post('/Categorias/Actualizar',this.editIcate,this.config)
            .then(response =>{
              console.log(response)
-             location.reload();
+             this.message2=true;
+             //location.reload();
            })
            .catch(e => {
            console.log(e);
@@ -253,6 +288,14 @@
            console.log(e.response.data.mensaje);
           })
          this.dialogDeletetcate=false;
+      },
+     actualizar(){
+         this.message2=false;
+          setTimeout(()=>{location.reload()},500)
+      },
+      crear(){
+         this.message1=false;
+          setTimeout(()=>{location.reload()},500)
       }
     },
      computed:{

@@ -197,6 +197,38 @@
         </v-card-actions>
       </v-card>
    </v-dialog>
+   <v-dialog v-model="message2">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro actualizado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="actualizar">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+   </v-dialog>
+   <v-dialog v-model="message1">
+            <v-card>
+               <v-card-title class="text-h5">
+          <v-alert
+      dense
+      text
+      type="success"
+    >
+     Registro creado correctamente
+    </v-alert>
+    </v-card-title>
+    <v-card-actions>
+       <v-btn color="blue darken-1" text @click="crear">OK</v-btn>
+    </v-card-actions>
+    </v-card>
+   </v-dialog>
    </v-row>
 </template>
 
@@ -231,6 +263,8 @@
         ],
         dialogarticulo:false,
          valid:false,
+        message1:false,
+        message2:false,
         codigo_articulo:'',
         descripcion_art: '',
         fotoart: '',
@@ -306,7 +340,8 @@
           axios.post('/Articulos/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
-          location.reload();
+          //location.reload();
+          this.message1=true;
           })
          .catch(e => {
             console.log(e);
@@ -324,7 +359,8 @@
            axios.post('/Articulos/Actualizar',this.editItem,this.config)
          .then(response =>{
           console.log(response.data)
-          location.reload();
+        //  location.reload();
+        this.message2=true;
           })
          .catch(e => {
             console.log(e);
@@ -338,6 +374,14 @@
         this.editItem = Object.assign({}, item)
         console.log(this.editItem);
       },
+       actualizar(){
+         this.message2=false;
+           setTimeout(()=>{location.reload()},500)
+      },
+      crear(){
+         this.message1=false;
+           setTimeout(()=>{location.reload()},500)
+      }
 
   },
    computed:{
