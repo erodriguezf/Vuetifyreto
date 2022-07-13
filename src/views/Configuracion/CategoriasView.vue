@@ -36,6 +36,7 @@
      </v-card>
       <v-dialog v-model="dialogcate">
        <v-card>
+         <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="addCategoria">
         <v-card-text>
           <v-row>
             <v-text-field
@@ -64,26 +65,6 @@
             required
           ></v-text-field>
           </v-row>
-          <v-row>
-            <v-text-field
-            :rules="fecharules"
-            v-model="fechacreacion_cat"
-            label="Fecha_Creacion"
-            required
-            type="date"
-          >
-          </v-text-field>
-         
-          </v-row>
-          <v-row>
-            <v-text-field
-             :rules="fecharules"
-            v-model="fechamodificacion_cat"
-            label="Fecha_modificacion"
-            required
-            type="date"
-          ></v-text-field>
-          </v-row>
         </v-card-text>
         <v-divider></v-divider>
 
@@ -93,10 +74,12 @@
             color="primary"
             text
             @click="addCategoria"
+            :disabled="!validateform"
           >
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
        </v-dialog>
        <v-dialog v-model="dialogeditcate">
@@ -125,22 +108,6 @@
             <v-text-field
             v-model="editIcate.foto"
             label="Foto"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editIcate.fechacreacion"
-            label="Fecha_Creacion"
-            required
-          >
-          </v-text-field>
-         
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editIcate.fechamodificacion"
-            label="Fecha_modificacion"
             required
           ></v-text-field>
           </v-row>
@@ -194,6 +161,7 @@
         ],
         dialogeditcate:false,
         dialogDeletetcate:false,
+        valid: false,
         editedcateIndex: -1,
          estados:[
           {text:'Activo',value:1},
@@ -235,10 +203,11 @@
         addCategoria(){
         if(this.editedcateIndex<0){
         this.dialogcate=false;
-        const nueva={id:0, descripcion:this.descripcion_cat, estado:this.estado, foto:this.foto_cat,fechacreacion: this.fechacreacion_cat, fechamodificacion:this.fechamodificacion_cat}
+        const nueva={id:0, descripcion:this.descripcion_cat, estado:this.estado, foto:this.foto_cat,fechacreacion: null, fechamodificacion:null}
         axios.post('/Categorias/Crear',nueva,this.config)
          .then(response =>{
-          console.log(response)
+          console.log(response);
+           location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -253,6 +222,7 @@
             axios.post('/Categorias/Actualizar',this.editIcate,this.config)
            .then(response =>{
              console.log(response)
+             location.reload();
            })
            .catch(e => {
            console.log(e);
@@ -285,7 +255,10 @@
          this.dialogDeletetcate=false;
       }
     },
-    computed:{
+     computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
     }
   })
 </script>

@@ -16,6 +16,7 @@
      </v-card>
       <v-dialog v-model="dialoglistado">
        <v-card>
+        <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="AddListado">
         <v-card-text>
           <v-row>
           <v-select
@@ -45,15 +46,6 @@
              :rules="saldorules"
           ></v-text-field>
           </v-row>
-           <v-row>
-            <v-text-field
-            v-model="fechaultimomovimiento"
-            label="Fecha Ultimo movimiento"
-             type="date"
-             :rules="fecharules"
-            required
-          ></v-text-field>
-          </v-row>
         </v-card-text>
         <v-divider></v-divider>
 
@@ -62,10 +54,13 @@
           <v-btn
             color="primary"
             text
-            @click="AddListado">
+            @click="AddListado"
+            :disabled="!validateform">
+            
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
    </v-dialog>
    </v-row>
@@ -98,6 +93,7 @@
             list_Bodegas:[],
             list_Tipo_movimiento:[],
             dialoglistado:false,
+            valid:false,
             id_articulo:0,
             id_bodega:0,
             saldo:0,
@@ -142,11 +138,12 @@
                 idArticulo:parseInt(this.id_articulo), 
                 idBodega:parseInt(this.id_bodega),
                 saldo:this.saldo,
-                fechaultimomovimiento:this.fechaultimomovimiento
+                fechaultimomovimiento:null
              }
              axios.post('/Inventario/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -156,6 +153,11 @@
             this.saldo=0,
             this.fechaultimomovimiento=''
           },
-   }
+   },
+    computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
+     }
   })
 </script>

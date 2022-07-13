@@ -37,6 +37,7 @@
      </v-card>
         <v-dialog v-model="dialogroles">
        <v-card>
+        <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="AddRoles">
         <v-card-text>
           <v-row>
             <v-text-field
@@ -66,10 +67,12 @@
           <v-btn
             color="primary"
             text
-            @click="AddRoles">
+            @click="AddRoles"
+            :disabled="!validateform">
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
        </v-dialog>
        <v-dialog v-model="dialogedittipo">
@@ -142,6 +145,7 @@
          ],
          estado: {text:'Activo',value:1},
         dialogedittipo:false,
+        valid:false,
        editedIndex: -1,
          editItem:{
           id:0,
@@ -172,6 +176,7 @@
           axios.post('/Roles/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -183,6 +188,7 @@
              axios.post('/Roles/Actualizar',this.editItem,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -203,5 +209,10 @@
         this.dialogDeletetipo = true
       },
     },
+     computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
+     }
   })
 </script>

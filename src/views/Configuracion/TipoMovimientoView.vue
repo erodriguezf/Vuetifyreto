@@ -36,6 +36,7 @@
      </v-card>
        <v-dialog v-model="dialogtipomv">
        <v-card>
+        <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="addTipoMovimiento">
         <v-card-text>
           <v-row>
             <v-text-field
@@ -63,24 +64,6 @@
 
           </v-select>
           </v-row>
-          <v-row>
-            <v-text-field
-             :rules="fecharules"
-            v-model="fechacreacion_move"
-            label="Fecha_Creacion"
-            required
-            type="date"
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            :rules="fecharules"
-            v-model="fechamodificacion_move"
-            label="Fecha_modificacion"
-            required
-            type="date"
-          ></v-text-field>
-          </v-row>
             <v-row>
           <v-select
              v-model="estado"
@@ -101,10 +84,12 @@
             color="primary"
             text
             @click="addTipoMovimiento"
+            :disabled="!validateform"
           >
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
    </v-dialog>
      <v-dialog v-model="dialogedittipo">
@@ -133,20 +118,6 @@
           >
 
           </v-select>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechacreacion"
-            label="Fecha_Creacion"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechamodificacion"
-            label="Fecha_modificacion"
-            required
-          ></v-text-field>
           </v-row>
            <v-row>
            <v-select
@@ -215,6 +186,7 @@ import axios from 'axios'
           dialogtipomv:false,
         dialogedittipo:false,
         dialogDeletetipo:false,
+        valid:false,
         lis_tipo:[-1,1],
          editedIndex: -1,
           estados:[
@@ -264,13 +236,14 @@ import axios from 'axios'
            codigo:this.codigo,
            descripcion:this.descripcion_move,
            factor:this.factor,
-           fechacreacion:this.fechacreacion_move,
-           fechamodificacion:this.fechamodificacion_move,
+           fechacreacion:null,
+           fechamodificacion:null,
            estado:this.estado
           }
            axios.post('/TipoMovimiento/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -285,6 +258,7 @@ import axios from 'axios'
           axios.post('/TipoMovimiento/Actualizar',this.editItem,this.config)
            .then(response =>{
              console.log(response)
+             location.reload();
            })
            .catch(e => {
            console.log(e);
@@ -308,6 +282,11 @@ import axios from 'axios'
          this.tipomovimiento.splice(this.editedIndex,1);
          this.dialogDeletetipo = false;
       },
+     },
+     computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
      }
  })
 </script>

@@ -35,6 +35,7 @@
      </v-card>
       <v-dialog v-model="dialogbodega">
        <v-card>
+         <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="Addbodega">
         <v-card-text>
           <v-row>
             <v-text-field
@@ -60,24 +61,6 @@
             required
           ></v-text-field>
           </v-row>
-          <v-row>
-            <v-text-field
-             :rules="fecharules"
-            v-model="fechacreacion_bode"
-            label="Fecha_Creacion"
-            required
-            type="date"
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-             :rules="fecharules"
-            v-model="fechamodificacion_bode"
-            label="Fecha_modificacion"
-            type="date"
-            required
-          ></v-text-field>
-          </v-row>
             <v-row>
           <v-select
              v-model="estado"
@@ -98,10 +81,12 @@
             color="primary"
             text
             @click="Addbodega"
+            :disabled="!validateform"
           >
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
       </v-dialog>
        <v-dialog v-model="dialogedittipo">
@@ -125,20 +110,6 @@
             <v-text-field
             v-model="editItem.foto"
             label="Foto"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechacreacion"
-            label="Fecha_Creacion"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechamodificacion"
-            label="Fecha_modificacion"
             required
           ></v-text-field>
           </v-row>
@@ -196,6 +167,7 @@
           v => !!v || 'La fecha es requerida',
         ],
         dialogbodega:false,
+        valid:false,
         codigo_bodega:'',
         descripcion_bode: '',
         fotobode: '',
@@ -245,13 +217,14 @@
          codigo:this.codigo_bodega,
          descripcion:this.descripcion_bode,
          foto:this.fotobode,
-         fechacreacion:this.fechacreacion_bode,
-         fechamodificacion:this.fechamodificacion_bode,
+         fechacreacion:null,
+         fechamodificacion:null,
          estado:this.estado
         }
         axios.post('/Bodegas/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -266,6 +239,7 @@
         axios.post('/Bodegas/Actualizar',this.editItem,this.config)
            .then(response =>{
              console.log(response)
+             location.reload();
            })
            .catch(e => {
            console.log(e);
@@ -278,6 +252,11 @@
         this.editedIndex = this.Bodegas.indexOf(item)
         this.editItem = Object.assign({}, item)
         console.log(this.editItem);
+      }
+     },
+     computed:{
+      validateform(){
+        return  this.valid == true?true:false;
       }
      }
 

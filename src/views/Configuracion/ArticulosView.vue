@@ -35,6 +35,7 @@
      </v-card>
       <v-dialog v-model="dialogarticulo">
        <v-card>
+        <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="AddArticulo">
         <v-card-text>
           <v-row>
             <v-text-field
@@ -91,24 +92,6 @@
              type="number"
           ></v-text-field>
           </v-row>
-          <v-row>
-            <v-text-field
-            :rules="fecharules"
-            v-model="fechacreacion_arti"
-            label="Fecha_Creacion"
-            required
-            type="date"
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-             :rules="fecharules"
-            v-model="fechamodificacion_arti"
-            label="Fecha_modificacion"
-            required
-            type="date"
-          ></v-text-field>
-          </v-row>
             <v-row>
           <v-select
              v-model="estado"
@@ -129,10 +112,12 @@
             color="primary"
             text
             @click="AddArticulo"
+            :disabled="!validateform"
           >
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
       </v-dialog>
        <v-dialog v-model="dialogedittipo">
@@ -182,20 +167,6 @@
             v-model="editItem.precioventa"
             label="Precio venta"
              type="number"
-            required
-          ></v-text-field>
-          </v-row>
-            <v-row>
-            <v-text-field
-            v-model="editItem.fechacreacion"
-            label="Fecha_creacion"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechamodificacion"
-            label="Fecha_modificacion"
             required
           ></v-text-field>
           </v-row>
@@ -259,6 +230,7 @@
            v => !!v || 'Ingrese un valor',
         ],
         dialogarticulo:false,
+         valid:false,
         codigo_articulo:'',
         descripcion_art: '',
         fotoart: '',
@@ -327,13 +299,14 @@
           idCategoria: parseInt(this.id_categoria),
           preciocompra:this.preciocompra,
           precioventa:this.precioventa,
-          fechacreacion:this.fechacreacion_arti,
-          fechamodificacion:this.fechamodificacion_arti,
+          fechacreacion:null,
+          fechamodificacion:null,
           estado:this.estado
         }
           axios.post('/Articulos/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -351,6 +324,7 @@
            axios.post('/Articulos/Actualizar',this.editItem,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -366,5 +340,10 @@
       },
 
   },
+   computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
+     }
   })
 </script>

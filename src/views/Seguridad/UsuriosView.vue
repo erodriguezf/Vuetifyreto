@@ -38,6 +38,7 @@
      </v-card>
        <v-dialog v-model="dialogusuario">
        <v-card>
+        <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="Addusuarios">
         <v-card-text>
           <v-row>
             <v-text-field
@@ -57,15 +58,6 @@
           ></v-text-field>
           </v-row>
           <v-row>
-            <v-text-field
-            v-model="ultimologin"
-            :rules="ultimorules"
-            label="Ultimo Loging"
-            type="date"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
           <v-select
              v-model="estado"
              :rules="estadorules"
@@ -77,24 +69,6 @@
           >   
           </v-select>
           </v-row>
-          <v-row>
-            <v-text-field
-            :rules="fecharules"
-            v-model="fechacreacion"
-            label="Fecha_Creacion"
-             type="date"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            :rules="fecharules"
-            v-model="fechamodificacion"
-            label="Fecha_modificacion"
-             type="date"
-            required
-          ></v-text-field>
-          </v-row>
         </v-card-text>
         <v-divider></v-divider>
 
@@ -103,10 +77,12 @@
           <v-btn
             color="primary"
             text
-            @click="Addusuarios">
+            @click="Addusuarios"
+            :disabled="!validateform">
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
       </v-dialog>
         <v-dialog v-model="dialogedittipo">
@@ -129,13 +105,6 @@
           ></v-text-field>
           </v-row>
           <v-row>
-            <v-text-field
-            v-model="editItem.ultimologin"
-            label="Ultimo Loging"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
            <v-select
              v-model="editItem.estado"
              :rules="estadorules"
@@ -146,20 +115,6 @@
             item-value="value"
           >   
           </v-select>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechacreacion"
-            label="Fecha_Creacion"
-            required
-          ></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechamodificacion"
-            label="Fecha_modificacion"
-            required
-          ></v-text-field>
           </v-row>
         </v-card-text>
         <v-divider></v-divider>
@@ -210,6 +165,7 @@
             v => !!v || 'La contraseña es requerida',
       ],
       dialogusuario:false,
+      valid:false,
       username:'',
       ultimologin:'',
       fechacreacion:'',
@@ -254,14 +210,15 @@
           username:this.username,
           password:this.password,
           nombre:this.username,
-          ultimologin:this.ultimologin,
+          ultimologin:null,
           estado:this.estado,
-          fechacreacion:this.fechacreacion,
-          fechamodificacion:this.fechamodificacion,
+          fechacreacion:null,
+          fechamodificacion:null,
         }
          axios.post('/Usuarios/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -277,6 +234,7 @@
             axios.post('/Usuarios/Actualizar',this.editItem,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -297,5 +255,10 @@
         this.dialogDeletetipo = true
       },
    },
+   computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
+     }
  })
 </script>

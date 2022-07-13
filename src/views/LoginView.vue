@@ -33,8 +33,15 @@
       dense
       outlined
       type="error"
-    v-if="error">
+    v-if="error1">
      <strong>Usuario </strong> o <strong>Coñtraseña</strong> Incorrecta
+    </v-alert>
+    <v-alert
+      dense
+      outlined
+      type="error"
+    v-if="error2">
+     <strong>El Usuario se encuentra inanactivo </strong> 
     </v-alert>
     </v-container>
   </v-form>
@@ -49,7 +56,8 @@ import axios from 'axios';
       posts: [],
       errors: [],
       valid: false,
-      error:false,
+      error1:false,
+      error2:false,
       disabled: true,
       email: '',
       emailRules: [
@@ -82,7 +90,15 @@ import axios from 'axios';
     })
     .catch(e => {
       this.errors.push(e);
-      this.error=true;
+      console.log(e.response.data.codigomensaje);
+       if(e.response.data.codigomensaje == 1000){
+          this.error1=true
+          this.error2=false
+      }
+      if(e.response.data.codigomensaje == 1001){
+          this.error2=true
+            this.error1=false
+      }
     })  
          
          console.log('username : '+ this.$store.state.username);

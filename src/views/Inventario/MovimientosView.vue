@@ -36,16 +36,8 @@
      </v-card>
      <v-dialog v-model="dialoglmovimiento">
        <v-card>
+         <v-form action class="form" v-model="valid" ref="Formvalidate" @submit="Addmovimiento">
         <v-card-text>
-          <v-row>
-            <v-text-field
-            v-model="fechahora"
-            label="Fecha Hora"
-            required
-             :rules="fecharules"
-             type="date"
-          ></v-text-field>
-          </v-row>
            <v-row>
           <v-select
             v-model="id_tipomovimiento"
@@ -114,22 +106,17 @@
           <v-btn
             color="primary"
             text
-            @click="Addmovimiento">
+            @click="Addmovimiento"
+            :disabled="!validateform">
             Cerrar
           </v-btn>
         </v-card-actions>
+        </v-form>
       </v-card>
      </v-dialog>
       <v-dialog v-model="dialogedittipo">
        <v-card>
         <v-card-text>
-          <v-row>
-            <v-text-field
-            v-model="editItem.fechahora"
-            label="Fecha Hora"
-            required
-          ></v-text-field>
-          </v-row>
           <v-row>
            <v-select
             v-model="editItem.idTipomovimiento"
@@ -237,6 +224,7 @@
                 v => !!v || 'El id del tipo de movimiento es requerido',
             ],
           dialoglmovimiento:false,
+          valid:false,
          fechahora:'',
          id_tipomovimiento:0,
          observaciones:'',
@@ -308,7 +296,7 @@
             this.dialoglmovimiento=false
             const nueva={
               id:0,
-              fechahora:this.fechahora,
+              fechahora:null,
               idTipomovimiento:this.id_tipomovimiento,
               observaciones:this.observaciones,
               idArticulo:this.id_producto_m,
@@ -319,6 +307,7 @@
              axios.post('/Movimiento/Crear',nueva,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -336,6 +325,7 @@
                  axios.post('/Movimiento/Actualizar',this.editItem,this.config)
          .then(response =>{
           console.log(response.data)
+          location.reload();
           })
          .catch(e => {
             console.log(e);
@@ -355,5 +345,10 @@
         this.dialogDeletetipo = true
       },
        },
+      computed:{
+      validateform(){
+        return  this.valid == true?true:false;
+      }
+     }
  })
 </script>

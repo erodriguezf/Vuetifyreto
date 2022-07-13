@@ -1,5 +1,5 @@
 <template>
-  <Bar
+  <Doughnut
     :chart-options="chartOptions"
     :chart-data="chartData"
     :chart-id="chartId"
@@ -15,7 +15,7 @@
 <script>
 const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Novimembre','Diciembre']
 
-import { Bar } from 'vue-chartjs/legacy'
+import { Doughnut } from 'vue-chartjs/legacy'
 import axios from 'axios'
 import {
   Chart as ChartJS,
@@ -32,7 +32,7 @@ ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 export default {
   name: 'BarChart',
   components: {
-    Bar
+   Doughnut
   },
   props: {
     chartId: {
@@ -66,9 +66,10 @@ export default {
   },
   data() {
     return {
-      saldo:[
+        saldo:[
 
       ],
+      cantidad:0,
       mesesfechas:[],
       config:{
               headers: {
@@ -83,7 +84,8 @@ export default {
         datasets: [
           {
             label: 'Saldo ($)',
-            backgroundColor: '#311B92',
+            backgroundColor: ['#76FF03','#FF1744','#F50057' ,'#AA00FF','#311B92','#3D5AFE','#00897B'
+                              ,'#00E5FF','#00BFA5','#00C853','#FFFF00','#FF6D00'],
             data: []
           }
         ]
@@ -97,11 +99,19 @@ export default {
    created () {
          axios.get('/Inventario/Get',this.config)
          .then(response => {
-            this.chartData.datasets[0].data= response.data.map(data=>data.saldo);
-            response.data.forEach(date => {
-                const nuevafecha = new Date(date.fechaultimomovimiento);
-                this.chartData.labels.push(meses[nuevafecha.getMonth()]);
+              this.chartData.labels=meses;
+              meses.forEach(mes=>{
+                  response.data.forEach(fecha => {
+                const nuevafecha = new Date(fecha.fechaultimomovimiento);
+                if(meses[nuevafecha.getMonth()] == mes){
+                   this.cantidad = this.cantidad+fecha.saldo;
+                }
               });
+                this.saldo.push(this.cantidad)
+                this.cantidad=0;
+              });
+               console.log(this.saldo);
+               this.chartData.datasets[0].data=this.saldo;
            
           })
          .catch(e => {
